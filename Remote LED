@@ -1,0 +1,15 @@
+load('api_config.js');
+load('api_gpio.js');
+load('api_timer.js');
+load('api_mqtt.js');
+
+let topic = '/devices/' + Cfg.get('device.id') + '/config';
+let pin = 21;
+
+GPIO.set_mode(pin, GPIO.MODE_OUTPUT);
+
+MQTT.sub(topic, function(conn, top, msg) {
+  print('Got config update:', msg.slice(0, 100));
+  let obj = JSON.parse(msg);
+  if (obj) GPIO.write(pin, obj.on);
+}, null);
