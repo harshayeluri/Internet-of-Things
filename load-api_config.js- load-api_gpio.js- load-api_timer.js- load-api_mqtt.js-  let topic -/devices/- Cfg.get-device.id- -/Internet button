@@ -1,0 +1,15 @@
+load('api_config.js');
+load('api_gpio.js');
+load('api_timer.js');
+load('api_mqtt.js');
+
+let topic = '/devices/' + Cfg.get('device.id') + '/events';
+let pin = 21;
+
+GPIO.set_mode(pin, GPIO.MODE_INPUT);
+GPIO.set_pull(pin, GPIO.PULL_DOWN);
+GPIO.set_button_handler(pin, GPIO.PULL_DOWN, GPIO.INT_EDGE_NEG, 200, function() {
+  let msg = JSON.stringify({ time: Timer.now() });
+  let ok = MQTT.pub(topic, msg, 1);
+  print(ok, msg);
+}, null);
